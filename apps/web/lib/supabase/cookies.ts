@@ -4,18 +4,18 @@ import { env } from "@/lib/env";
 export function getCookieOptions(options: CookieOptions): CookieOptions {
   const isProduction = process.env.NODE_ENV === "production";
   const appUrl = env.APP_URL;
-  
+
   let domain = undefined;
   if (isProduction && appUrl) {
     try {
       const url = new URL(appUrl);
       const hostname = url.hostname;
-      
+
       // Only set domain if it's not localhost and not an IP address
       if (hostname !== "localhost" && !/^(\d{1,3}\.){3}\d{1,3}$/.test(hostname)) {
         domain = hostname;
       }
-    } catch (e) {
+    } catch {
       console.error("Invalid APP_URL for cookie domain:", appUrl);
     }
   }
