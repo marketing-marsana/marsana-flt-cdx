@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS public.fuel_logs (
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
   deleted_at timestamptz,
-  CONSTRAINT fuel_logs_total_amount_check CHECK (total_amount = quantity_liters * price_per_liter)
+  CHECK (total_amount = quantity_liters * price_per_liter)
 );
 
 CREATE TRIGGER fuel_logs_set_updated_at
