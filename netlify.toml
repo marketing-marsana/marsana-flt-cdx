@@ -5,3 +5,28 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Security headers for authentication
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=63072000; includeSubDomains; preload"
+
+# Supabase auth cookie headers
+[[headers]]
+  for = "/api/auth/*"
+  [headers.values]
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+
+# Cookie handling for Supabase auth is managed via middleware.ts and server.ts
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Removed manual Set-Cookie headers as they interfere with dynamic auth cookies

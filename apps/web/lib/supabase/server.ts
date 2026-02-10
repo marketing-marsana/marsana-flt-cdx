@@ -4,6 +4,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 import { env, requireEnv } from "@/lib/env";
+import { getCookieOptions } from "./cookies";
 
 export function createSupabaseServerClient() {
   const cookieStore = cookies();
@@ -19,7 +20,8 @@ export function createSupabaseServerClient() {
         setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
           try {
             cookiesToSet.forEach(({ name, value, options }) => {
-              cookieStore.set(name, value, options);
+              const cookieOptions = getCookieOptions(options);
+              cookieStore.set(name, value, cookieOptions);
             });
           } catch {
             // cookies() can be read-only in Server Components.

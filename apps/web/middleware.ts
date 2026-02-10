@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { env, requireEnv } from "@/lib/env";
+import { getCookieOptions } from "@/lib/supabase/cookies";
 
 const PUBLIC_PATHS = new Set(["/login", "/setup"]);
 
@@ -19,7 +20,13 @@ export async function middleware(request: NextRequest) {
 
   const response = NextResponse.next({ request });
 
-  const hasAuthCookie = request.cookies.getAll().some((cookie) => cookie.name.startsWith("sb-"));
+  // Check for Supabase auth cookies - handle both standard and partitioned cookies
+  // We check for any 'sb-' prefix to be more resilient to naming variations
+  const hasAuthCookie = request.cookies.getAll().some((cookie) =>
+    cookie.name.startsWith("sb-") &&
+    cookie.value &&
+    cookie.value.length > 0
+  );
 
   if (!hasAuthCookie && !PUBLIC_PATHS.has(pathname)) {
     const redirectUrl = request.nextUrl.clone();
@@ -41,10 +48,12 @@ export async function middleware(request: NextRequest) {
           return request.cookies.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
-          response.cookies.set({ name, value, ...options });
+          const cookieOptions = getCookieOptions(options);
+          response.cookies.set({ name, value, ...cookieOptions });
         },
         remove(name: string, options: CookieOptions) {
-          response.cookies.set({ name, value: "", ...options });
+          const cookieOptions = getCookieOptions(options);
+          response.cookies.set({ name, value: "", ...cookieOptions });
         },
       },
     },
